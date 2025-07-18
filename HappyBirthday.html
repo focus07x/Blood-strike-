@@ -17,7 +17,7 @@
   <canvas id="canvas"></canvas>
 
   <script>
-    // พื้นหลัง Matrix rain สีชมพู ช้า
+    // พื้นหลัง Matrix rain สีชมพู
     const bgCanvas = document.getElementById('background');
     const bgCtx = bgCanvas.getContext('2d');
     bgCanvas.width = window.innerWidth;
@@ -57,13 +57,13 @@
     }
     drawMatrixRain();
 
-    // ข้อความแบบจุด (density = 4 จุดห่างขึ้น)
+    // จุดข้อความ
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const words = ['3', '2', '1', 'HAPPY', 'BIRTHDAY', 'TO', '9ARMZ'];
+    const words = ['3', '2', '1', 'HAPPY', 'BIRTHDAY', 'TO', 'YOU', '9ARMZ'];
     let currentWordIndex = -1;
     let particles = [];
     const density = 4;
@@ -148,12 +148,11 @@
       changeToNextWord();
       setTimeout(() => {
         disperseParticles();
-      }, 3000); // แสดงคำ 3 วินาที ก่อนกระจาย
+      }, 3000); // แสดงคำ 3 วิ ก่อนกระจาย
     }
 
     changeToNextWord();
     loop();
-
     setInterval(nextWord, 4000); // เปลี่ยนคำใหม่ทุก 4 วินาที
 
     window.addEventListener('resize', () => {
