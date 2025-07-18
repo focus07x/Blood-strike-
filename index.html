@@ -1,166 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Hacker Birthday for 9ARMZ</title>
+  <meta charset="UTF-8">
+  <title>Hacker Background with Steps</title>
   <style>
     html, body {
-      margin: 0; padding: 0; overflow: hidden; background: black;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+      font-family: monospace;
+      height: 100%;
     }
+
     canvas {
-      position: absolute; top: 0; left: 0; display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: block;
+      z-index: 0;
+    }
+
+    .content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 1;
+      color: #00ff00;
+    }
+
+    .content h1 {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .content button {
+      font-size: 1.2em;
+      padding: 10px 30px;
+      border: 2px solid #00ff00;
+      background: transparent;
+      color: #00ff00;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .content button:hover {
+      background: #00ff00;
+      color: black;
     }
   </style>
 </head>
 <body>
-  <canvas id="background"></canvas>
-  <canvas id="canvas"></canvas>
+  <canvas id="hackerCanvas"></canvas>
+
+  <div class="content">
+    <h1 id="mainText">ฮันแน่! ขี้สงสัยนะเราอะ</h1>
+    <button onclick="nextClicked()">กด</button>
+  </div>
 
   <script>
-    // พื้นหลัง Matrix rain สีชมพู
-    const bgCanvas = document.getElementById('background');
-    const bgCtx = bgCanvas.getContext('2d');
-    bgCanvas.width = window.innerWidth;
-    bgCanvas.height = window.innerHeight;
-
-    const chars = "ｱｲｳｴｵｶｷｸｹｺｻｼｽ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const fontSize = 16;
-    const columns = Math.floor(bgCanvas.width / fontSize);
-    const drops = Array(columns).fill(1);
-    let matrixSpeed = 0.25;
-    let frameCounter = 0;
-
-    function drawMatrixRain() {
-      frameCounter += matrixSpeed;
-      if (frameCounter < 1) {
-        requestAnimationFrame(drawMatrixRain);
-        return;
-      }
-      frameCounter = 0;
-
-      bgCtx.fillStyle = "rgba(0, 0, 0, 0.2)";
-      bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
-
-      bgCtx.fillStyle = "#ff66ff";
-      bgCtx.font = fontSize + "px monospace";
-
-      for(let i = 0; i < drops.length; i++) {
-        const text = chars[Math.floor(Math.random() * chars.length)];
-        bgCtx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if(drops[i] * fontSize > bgCanvas.height || Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
-
-      requestAnimationFrame(drawMatrixRain);
-    }
-    drawMatrixRain();
-
-    // จุดข้อความ
-    const canvas = document.getElementById('canvas');
+    // Hacker background
+    const canvas = document.getElementById('hackerCanvas');
     const ctx = canvas.getContext('2d');
+
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const words = ['3', '2', '1', 'HAPPY', 'BIRTHDAY', 'TO', 'YOU', '9ARMZ'];
-    let currentWordIndex = -1;
-    let particles = [];
-    const density = 4;
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = [];
 
-    function createParticlesFromText(text) {
-      const offCanvas = document.createElement('canvas');
-      const offCtx = offCanvas.getContext('2d');
-      offCanvas.width = canvas.width;
-      offCanvas.height = canvas.height;
+    for (let x = 0; x < columns; x++) {
+      drops[x] = 1;
+    }
 
-      offCtx.fillStyle = 'white';
-      offCtx.font = 'bold 160px monospace';
-      offCtx.textAlign = 'center';
-      offCtx.textBaseline = 'middle';
-      offCtx.clearRect(0, 0, offCanvas.width, offCanvas.height);
-      offCtx.fillText(text, canvas.width / 2, canvas.height / 2);
+    function draw() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const imgData = offCtx.getImageData(0, 0, canvas.width, canvas.height);
-      const newParticles = [];
+      ctx.fillStyle = '#0F0';
+      ctx.font = fontSize + 'px monospace';
 
-      for(let y = 0; y < canvas.height; y += density) {
-        for(let x = 0; x < canvas.width; x += density) {
-          const index = (y * canvas.width + x) * 4;
-          const alpha = imgData.data[index + 3];
-          if(alpha > 128) {
-            newParticles.push({
-              x: Math.random() * canvas.width,
-              y: Math.random() * canvas.height,
-              tx: x,
-              ty: y,
-              vx: 0,
-              vy: 0
-            });
-          }
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
         }
-      }
-      return newParticles;
-    }
 
-    function updateParticles() {
-      for(let p of particles) {
-        const dx = p.tx - p.x;
-        const dy = p.ty - p.y;
-        p.vx += dx * 0.01;
-        p.vy += dy * 0.01;
-        p.vx *= 0.9;
-        p.vy *= 0.9;
-        p.x += p.vx;
-        p.y += p.vy;
+        drops[i]++;
       }
     }
 
-    function drawParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#ff66ff';
-      for(let p of particles) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-        ctx.fill();
+    setInterval(draw, 33);
+
+    // กดปุ่มเปลี่ยนข้อความและไป URL
+    let clickCount = 0;
+    function nextClicked() {
+      clickCount++;
+
+      const mainText = document.getElementById("mainText");
+
+      if (clickCount === 1) {
+        mainText.innerText = "ไปต่อมั้ย";
+      } else if (clickCount === 2) {
+        mainText.innerText = "GOOD BOY😂";
+      } else if (clickCount === 3) {
+        window.location.href = "https://youtu.be/dQw4w9WgXcQ?si=ilgO5HZAX4Qxjskr"; // << เปลี่ยน URL ได้ตรงนี้
       }
     }
-
-    function disperseParticles() {
-      for(let p of particles) {
-        p.tx = Math.random() * canvas.width;
-        p.ty = Math.random() * canvas.height;
-      }
-    }
-
-    function loop() {
-      updateParticles();
-      drawParticles();
-      requestAnimationFrame(loop);
-    }
-
-    function changeToNextWord() {
-      currentWordIndex = (currentWordIndex + 1) % words.length;
-      particles = createParticlesFromText(words[currentWordIndex]);
-    }
-
-    function nextWord() {
-      changeToNextWord();
-      setTimeout(() => {
-        disperseParticles();
-      }, 3000); // แสดงคำ 3 วิ ก่อนกระจาย
-    }
-
-    changeToNextWord();
-    loop();
-    setInterval(nextWord, 4000); // เปลี่ยนคำใหม่ทุก 4 วินาที
-
-    window.addEventListener('resize', () => {
-      bgCanvas.width = window.innerWidth;
-      bgCanvas.height = window.innerHeight;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
   </script>
 </body>
 </html>
